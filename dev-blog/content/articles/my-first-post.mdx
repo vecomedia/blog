@@ -1,0 +1,44 @@
+---
+title: "Next.js Fehler beheben: ENOENT: no such file or directory"
+slug: "nextjs-enoent-error"
+publishedAt: "2026-08-11"
+featured: false
+tags: ["nextjs", "typescript"]
+excerpt: "Wie man den berüchtigten ENOENT-Fehler bei der Nutzung von fs in Next.js Server-Komponenten behebt."
+---
+
+# Next.js Fehler: ENOENT beim Lesen von Dateien
+
+Wenn du in Next.js versucht, Markdown- oder MDX-Dateien über das Node.js-Dateisystem (`fs`) einzulesen, stößt du oft auf diesen Fehler:
+
+> **Uncaught Error: ENOENT: no such file or directory, scandir ...**
+
+Hier ist die Zusammenfassung, wie wir diesen Fehler im Chat gelöst haben.
+
+## 1. Die Ursache des Problems
+
+Der Fehler tritt meistens aus zwei Gründen auf:
+1. **Falscher Kontext:** Next.js versucht fälschlicherweise, den Code im Browser statt auf dem Server auszuführen (z. B. durch ein vergessenes `"use client"`).
+2. **Relative Pfade:** Relative Pfade verschieben sich, wenn Next.js die Anwendung für den Produktions-Build kompiliert.
+
+## 2. Die Lösung: Absoluter Pfad mit `process.cwd()`
+
+Nutze immer `process.cwd()`, um den Pfad ausgehend vom Hauptverzeichnis (Root) deiner Anwendung zu berechnen:
+
+```typescript
+// src/lib/api/articles.ts
+import fs from 'fs';
+import path from 'path';
+
+const articlesDir = path.join(process.cwd(), 'content/articles');
+```
+
+## 3. TypeScript Absicherung
+
+Damit der Build nicht fehlschlägt, falls ein Ordner leer ist oder versteckte Systemdateien (wie `.DS_Store`) existieren, filtern wir `null`-Werte mit einem **Type Guard** heraus:
+
+```typescript
+return articles.filter((article): article is Exclude<typeof article, null> => article !== null);
+```
+
+Jetzt sollte deine Artikelliste den Titel **"Next.js Fehler beheben: ENOENT: no such file or directory"** im Browser anzeigen!
