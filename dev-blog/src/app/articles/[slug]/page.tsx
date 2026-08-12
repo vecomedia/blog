@@ -2,8 +2,10 @@
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getArticleBySlug, getArticleSlugs } from "@/lib/api/mdx";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { mdxComponents } from "@/lib/components/ui/mdx-components";
 
-// Wichtig für Next.js 15: Typisierung der Params als Promise
+
 interface Props {
   params: Promise<{ slug: string }> | { slug: string };
 }
@@ -12,10 +14,18 @@ export async function generateStaticParams() {
   return getArticleSlugs().map((slug) => ({ slug }));
 }
 
+function formatDateDe(date: string) {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return date;
+  return d.toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export default async function ArticlePage({ params }: Props) {
-  // Params auflösen für Next.js 15 Kompatibilität
   const resolvedParams = await params;
-  
   let article;
   try {
     article = getArticleBySlug(resolvedParams.slug);
@@ -23,18 +33,79 @@ export default async function ArticlePage({ params }: Props) {
     notFound();
   }
 
-  // Hier lag der Fehler: Es heißt frontmatter, nicht meta!
   const { frontmatter, content } = article;
+  const isOwn = frontmatter.source === "eigen";
 
   return (
-    <article style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-      <h1>{frontmatter.title}</h1>
-      {/* publishedAt statt date nutzen, da es so im Schema definiert ist */}
-      <time>{frontmatter.publishedAt}</time>
-      
-      <div className="prose" style={{ marginTop: '2rem' }}>
-        <MDXRemote source={content} />
-      </div>
-    </article>
+    <main className="px-7 py-12 pt-20 lg:px-12 lg:py-16 lg:pt-24">
+      <article className="mx-auto max-w-4xl overflow-hidden border border-border bg-card">
+        {frontmatter.image && (
+          <div className="relative h-64 bg-muted md:h-80">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={frontmatter.image}
+              alt={frontmatter.imageAlt ?? frontmatter.title}
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-primary/35" />
+          </div>
+        )}
+
+        <div className="p-8 lg:p-10">
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            {isOwn ? (
+              <span className="inline-flex items-center gap-1 bg-accent px-2 py-0.5 font-mono text-[12px] uppercase tracking-[0.22em] text-accent-foreground">
+                Eigene
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 border border-border px-2 py-0.5 font-mono text-[12px] uppercase tracking-[0.22em] text-muted-foreground">
+                Extern
+              </span>
+            )}
+            {frontmatter.category && (
+              <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-muted-foreground">
+                {frontmatter.category}
+              </span>
+            )}
+            <time className="font-mono text-[12px] tracking-wider text-muted-foreground">
+              {formatDateDe(frontmatter.publishedAt)}
+            </time>
+            {frontmatter.readTime && (
+              <>
+                <span className="font-mono text-[12px] text-muted-foreground/40">
+                  ·
+                </span>
+                <span className="font-mono text-[12px] tracking-wider text-muted-foreground">
+                  {frontmatter.readTime}
+                </span>
+              </>
+            )}
+          </div>
+
+          <h1 className="mb-4 text-4xl font-bold tracking-tight text-heading ">
+            {frontmatter.title}
+          </h1>
+
+          {frontmatter.excerpt && (
+            <p className="mb-8 text-base leading-relaxed text-foreground/75">
+              {frontmatter.excerpt}
+            </p>
+          )}
+
+          <div className="prose prose-neutral max-w-none space-y-5 border-t border-border text-sm leading-relaxed text-foreground/80 [&_h2]:font-display [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:tracking-tight [&_h2]:text-primary">
+            <MDXRemote source={content} components={mdxComponents}  />
+          </div>
+
+          <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-border pt-6">
+            <Link
+              href="/"
+              className="veco-btn inline-flex items-center gap-2 border px-4 py-2 font-mono text-[12px] uppercase tracking-[0.2em] text-foreground/70 transition-colors hover:border-accent hover:text-accent"
+            >
+              Zurück zu Notizen
+            </Link>
+          </div>
+        </div>
+      </article>
+    </main>
   );
 }

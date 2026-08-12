@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
+import type { BlogPost } from "@/lib/schemas/blogPost";
+
 const articlesDir = path.join(process.cwd(), 'content/articles');
 
 export function getAllArticles() {
@@ -38,4 +40,28 @@ export function getAllArticles() {
     console.error("❌ Fehler beim Lesen der Artikel:", error);
     return [];
   }
+}
+
+type LocalArticle = NonNullable<ReturnType<typeof getAllArticles>[number]>;
+
+function toBlogPost(article: LocalArticle): BlogPost {
+  return {
+    id: article.slug,
+    slug: article.slug,
+    title: article.meta.title ?? "Unbenannter Artikel",
+    excerpt: article.meta.excerpt ?? "",
+    image: article.meta.image ?? "",
+    imageAlt: article.meta.imageAlt ?? "",
+    category: article.meta.category ?? "",
+    date: article.meta.date ?? "",
+    readTime: article.meta.readTime ?? "",
+    source: "eigen",
+    featured: article.meta.featured,
+  };
+}
+
+export function getAllArticlesAsPosts(): BlogPost[] {
+  return getAllArticles()
+    .filter((a): a is LocalArticle => Boolean(a))
+    .map(toBlogPost);
 }

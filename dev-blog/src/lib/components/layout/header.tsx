@@ -1,9 +1,10 @@
 interface HeaderProps {
   totalCount: number;
   externalCount: number;
+  internalCount: number;
 }
 
-export function Header({ totalCount, externalCount }: HeaderProps) {
+export function Header({ totalCount, externalCount, internalCount }: HeaderProps) {
   return (
     <header className="bg-primary pt-14 text-primary-foreground">
       <div className="flex flex-col justify-between gap-8 px-7 py-14 lg:flex-row lg:items-end lg:px-12 lg:py-20">
@@ -32,6 +33,10 @@ export function Header({ totalCount, externalCount }: HeaderProps) {
         <button className="px-5 py-4 font-mono text-[12px] uppercase tracking-[0.25em] text-primary-foreground/40">
           Extern
           <span className="ml-2 text-primary-foreground/25">{externalCount}</span>
+        </button>
+		   <button className="px-5 py-4 font-mono text-[12px] uppercase tracking-[0.25em] text-primary-foreground/40">
+          Eigene
+          <span className="ml-2 text-primary-foreground/25">{internalCount}</span>
         </button>
       </div>
     </header>

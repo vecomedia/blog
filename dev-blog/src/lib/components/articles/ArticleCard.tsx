@@ -1,19 +1,23 @@
 import type { BlogPost } from "@/lib/schemas/blogPost";
 import { Badge } from "../ui/badge";
-
+import Link from "next/link"; // Wichtig für die schnelle interne Weiterleitung
 
 interface ArticleCardProps {
   post: BlogPost;
 }
 
 export function ArticleCard({ post }: ArticleCardProps) {
-  return (
-    <a
-      href={post.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex flex-col overflow-hidden border border-border bg-card transition-colors duration-200 hover:border-accent"
-    >
+  // 1. Wenn source "eigen" ist, nutzen wir das Routing für deine lokalen Artikel
+  const isInternal = post.source === "eigen";
+  
+  // 2. Das generiert exakt deinen Wunschpfad: /articles/my-first-post
+  const href = isInternal ? `/articles/${post.slug}` : (post.url || "#");
+
+  const cardClassName = "group flex flex-col overflow-hidden border border-border bg-card transition-colors duration-200 hover:border-accent";
+
+  // Der gesamte Inhalt der Karte (Bilder, Titel, Badge, etc.)
+  const CardContent = () => (
+    <>
       <div className="relative h-48 overflow-hidden bg-muted">
         <img
           src={post.image}
@@ -43,6 +47,27 @@ export function ArticleCard({ post }: ArticleCardProps) {
           </div>
         </div>
       </div>
+    </>
+  );
+
+  // 3. Wenn "eigen": Nutze Next.js Link für blitzschnelles Laden ohne Seiten-Reload
+  if (isInternal) {
+    return (
+      <Link href={href} className={cardClassName}>
+        <CardContent />
+      </Link>
+    );
+  }
+
+  // Wenn "extern": Öffne in einem neuen Tab
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cardClassName}
+    >
+      <CardContent />
     </a>
   );
 }

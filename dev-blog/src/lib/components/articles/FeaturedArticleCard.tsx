@@ -1,18 +1,24 @@
 import type { BlogPost } from "@/lib/schemas/blogPost";
 import { Badge } from "@/lib/components/ui/badge";
+import Link from "next/link"; // 1. Next.js Link importieren
 
 interface FeaturedArticleCardProps {
   post: BlogPost;
 }
 
 export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
-  return (   
-	<a
-      href={post.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group grid grid-cols-1 overflow-hidden border border-border bg-card transition-colors duration-200 hover:border-accent lg:grid-cols-[3fr_2fr]"
-    >
+  // 2. Prüfen, ob es ein eigener Artikel ist
+  const isInternal = post.source === "eigen";
+  
+  // 3. Pfad bestimmen: Entweder interne Route über den Slug oder externe URL
+  const href = isInternal ? `/articles/${post.slug}` : (post.url || "#");
+
+  // Die CSS-Klassen für das Layout bleiben absolut identisch
+  const cardClassName = "group grid grid-cols-1 overflow-hidden border border-border bg-card transition-colors duration-200 hover:border-accent lg:grid-cols-[3fr_2fr]";
+
+  // Der gesamte innere Inhalt der Featured Card
+  const CardContent = () => (
+    <>
       <div className="relative h-64 overflow-hidden bg-muted lg:h-auto">
         <img
           src={post.image}
@@ -21,7 +27,7 @@ export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
         />
         <div className="absolute inset-0 bg-primary/20" />
         <div className="absolute left-4 top-4">
-          <span className="bg-accent px-2 py-1 font-mono text-[12px] uppercase tracking-[0.22em] text-white">
+          <span className="bg-accent px-4 py-2 font-mono text-[12px] uppercase tracking-[0.22em] text-muted-foreground">
             Featured
           </span>
         </div>
@@ -47,11 +53,31 @@ export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
             <span className="font-mono text-[12px] text-muted-foreground/50">·</span>
             <span className="font-mono text-[12px] tracking-wider text-muted-foreground">{post.readTime}</span>
           </div>
-          <span className="flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.2em] text-accent transition-all duration-200 group-hover:gap-2.5">
+          <span className="veco-btn inline-flex items-center gap-2 border px-4 py-2 font-mono text-[12px] uppercase tracking-[0.2em] text-foreground/70 transition-colors hover:border-accent hover:text-accent">
             Lesen
           </span>
         </div>
       </div>
+    </>
+  );
+
+  // 4. Bedingtes Rendering: Next.js Link für intern, normales <a> für externe Links
+  if (isInternal) {
+    return (
+      <Link href={href} className={cardClassName}>
+        <CardContent />
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cardClassName}
+    >
+      <CardContent />
     </a>
   );
 }
