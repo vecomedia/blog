@@ -34,7 +34,7 @@ export function ArticleCard({ post }: ArticleCardProps) {
           </span>
         </div>
 
-        <h3 className="mb-3 line-clamp-3 font-display text-lg font-semibold uppercase leading-[1.1] tracking-tight text-primary">
+        <h3 className="mb-3 line-clamp-3 font-display text-lg font-semibold uppercase leading-[1.1] tracking-tight">
           {post.title}
         </h3>
         <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-foreground/65">{post.excerpt}</p>
@@ -50,7 +50,7 @@ export function ArticleCard({ post }: ArticleCardProps) {
     </>
   );
 
-  // 3. Wenn "eigen": Nutze Next.js Link für blitzschnelles Laden ohne Seiten-Reload
+ 
   if (isInternal) {
     return (
       <Link href={href} className={cardClassName}>

@@ -37,11 +37,9 @@ export default async function ArticlePage({ params }: Props) {
   const isOwn = frontmatter.source === "eigen";
 
   return (
-    <main className="px-7 py-12 pt-20 lg:px-12 lg:py-16 lg:pt-24">
-      <article className="mx-auto max-w-4xl overflow-hidden border border-border bg-card">
+    <main className="bg-card">
         {frontmatter.image && (
-          <div className="relative h-64 bg-muted md:h-80">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+			<div className="relative h-84 bg-muted md:h-80">          
             <img
               src={frontmatter.image}
               alt={frontmatter.imageAlt ?? frontmatter.title}
@@ -51,6 +49,9 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         )}
 
+	<article className={`mx-auto max-w-4xl overflow-hidden border border-border bg-primary-foreground text-primary ${
+        frontmatter.image ? "relative -mt-16 md:-mt-24" : ""
+      }`}>
         <div className="p-8 lg:p-10">
           <div className="mb-6 flex flex-wrap items-center gap-3">
             {isOwn ? (
@@ -87,19 +88,19 @@ export default async function ArticlePage({ params }: Props) {
           </h1>
 
           {frontmatter.excerpt && (
-            <p className="mb-8 text-base leading-relaxed text-foreground/75">
+            <p className="mb-8 text-base leading-relaxed text-primary">
               {frontmatter.excerpt}
             </p>
           )}
 
-          <div className="prose prose-neutral max-w-none space-y-5 border-t border-border text-sm leading-relaxed text-foreground/80 [&_h2]:font-display [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:tracking-tight [&_h2]:text-primary">
+          <div className="prose prose-neutral max-w-none space-y-5 border-t border-border text-sm leading-relaxed text-foreground/80 [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-tight">
             <MDXRemote source={content} components={mdxComponents}  />
           </div>
 
           <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-border pt-6">
             <Link
               href="/"
-              className="veco-btn inline-flex items-center gap-2 border px-4 py-2 font-mono text-[12px] uppercase tracking-[0.2em] text-foreground/70 transition-colors hover:border-accent hover:text-accent"
+              className="inline-flex items-center gap-2 border px-4 py-2 font-mono text-[12px] uppercase tracking-[0.2em] text-primary transition-colors hover:border-accent hover:text-accent"
             >
               Zurück zu Notizen
             </Link>

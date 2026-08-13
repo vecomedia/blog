@@ -12,7 +12,7 @@ export const blogPostSchema = z.object({
   readTime: z.string(),
   source: z.enum(["eigen", "extern"]),
   url: z.string().optional(),
-  featured: z.boolean().optional(),
+  featured: z.boolean().optional()
 });
 
 export type BlogPost = z.infer<typeof blogPostSchema>;

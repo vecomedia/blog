@@ -27,7 +27,7 @@ export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
         />
         <div className="absolute inset-0 bg-primary/20" />
         <div className="absolute left-4 top-4">
-          <span className="bg-accent px-4 py-2 font-mono text-[12px] uppercase tracking-[0.22em] text-muted-foreground">
+          <span className="bg-accent px-2 py-2 font-mono text-[12px] uppercase tracking-[0.22em] text-muted-foreground">
             Featured
           </span>
         </div>
@@ -41,7 +41,7 @@ export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
               {post.category}
             </span>
           </div>
-          <h2 className="mb-4 font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-semibold uppercase leading-[1.05] tracking-tight text-primary">
+          <h2 className="mb-4 font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-semibold uppercase leading-[1.05] tracking-tight">
             {post.title}
           </h2>
           <p className="text-sm leading-relaxed text-foreground/70">{post.excerpt}</p>
@@ -53,7 +53,7 @@ export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
             <span className="font-mono text-[12px] text-muted-foreground/50">·</span>
             <span className="font-mono text-[12px] tracking-wider text-muted-foreground">{post.readTime}</span>
           </div>
-          <span className="veco-btn inline-flex items-center gap-2 border px-4 py-2 font-mono text-[12px] uppercase tracking-[0.2em] text-foreground/70 transition-colors hover:border-accent hover:text-accent">
+          <span className="flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.2em] text-accent transition-all duration-200 group-hover:gap-2.5">
             Lesen
           </span>
         </div>
@@ -61,7 +61,7 @@ export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
     </>
   );
 
-  // 4. Bedingtes Rendering: Next.js Link für intern, normales <a> für externe Links
+  
   if (isInternal) {
     return (
       <Link href={href} className={cardClassName}>
