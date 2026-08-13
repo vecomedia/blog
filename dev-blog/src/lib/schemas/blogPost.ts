@@ -8,10 +8,11 @@ export const blogPostSchema = z.object({
   image: z.url(),
   imageAlt: z.string(),
   category: z.string(),
-  date: z.iso.date(), 
+  date: z.string(), 
   readTime: z.string(),
   source: z.enum(["eigen", "extern"]),
-  url: z.string().optional(),
+   url: z.string().url().optional().or(z.literal("")),
+  tags: z.array(z.string()).default([]),
   featured: z.boolean().optional()
 });
 

@@ -4,7 +4,11 @@ import { getArticleBySlug, getArticleSlugs } from "@/lib/api/mdx";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { mdxComponents } from "@/lib/components/ui/mdx-components";
+import { MoreArticles } from "@/lib/components/articles/MoreArticles";
 
+import { fetchExternalArticles } from "@/lib/api/news";
+import { getAllArticlesAsPosts } from "@/lib/api/articles";
+import type { BlogPost } from "@/lib/schemas/blogPost";
 
 interface Props {
   params: Promise<{ slug: string }> | { slug: string };
@@ -12,6 +16,24 @@ interface Props {
 
 export async function generateStaticParams() {
   return getArticleSlugs().map((slug) => ({ slug }));
+}
+
+async function getMorePosts(currentSlug: string): Promise<BlogPost[]> {
+  const [externalResult, localResult] = await Promise.allSettled([
+    fetchExternalArticles("frontend"),
+    Promise.resolve(getAllArticlesAsPosts()),
+  ]);
+
+  const external = externalResult.status === "fulfilled" ? externalResult.value : [];
+  const local = localResult.status === "fulfilled" ? localResult.value : [];
+
+  // Kombinieren und nach Datum sortieren
+  const allPosts = [...local, ...external].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  // Den aktuell geöffneten Artikel herausfiltern
+  return allPosts.filter((post) => post.slug !== currentSlug);
 }
 
 function formatDateDe(date: string) {
@@ -32,26 +54,29 @@ export default async function ArticlePage({ params }: Props) {
   } catch (error) {
     notFound();
   }
-
+  const suggestedArticles = await getMorePosts(resolvedParams.slug);
+  
   const { frontmatter, content } = article;
   const isOwn = frontmatter.source === "eigen";
 
   return (
     <main className="bg-card">
-        {frontmatter.image && (
-			<div className="relative h-84 bg-muted md:h-80">          
-            <img
-              src={frontmatter.image}
-              alt={frontmatter.imageAlt ?? frontmatter.title}
-              className="h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-primary/35" />
-          </div>
-        )}
+      {frontmatter.image && (
+        <div className="relative h-84 bg-muted md:h-80">
+          <img
+            src={frontmatter.image}
+            alt={frontmatter.imageAlt ?? frontmatter.title}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-primary/35" />
+        </div>
+      )}
 
-	<article className={`mx-auto max-w-4xl overflow-hidden border border-border bg-primary-foreground text-primary ${
-        frontmatter.image ? "relative -mt-16 md:-mt-24" : ""
-      }`}>
+      <article
+        className={`mx-auto max-w-4xl overflow-hidden border border-border bg-primary-foreground text-primary ${
+          frontmatter.image ? "relative -mt-16 md:-mt-24" : ""
+        }`}
+      >
         <div className="p-8 lg:p-10">
           <div className="mb-6 flex flex-wrap items-center gap-3">
             {isOwn ? (
@@ -94,7 +119,7 @@ export default async function ArticlePage({ params }: Props) {
           )}
 
           <div className="prose prose-neutral max-w-none space-y-5 border-t border-border text-sm leading-relaxed text-foreground/80 [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-tight">
-            <MDXRemote source={content} components={mdxComponents}  />
+            <MDXRemote source={content} components={mdxComponents} />
           </div>
 
           <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-border pt-6">
@@ -107,6 +132,7 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         </div>
       </article>
+      <MoreArticles posts={suggestedArticles}/>
     </main>
   );
 }
