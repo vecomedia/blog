@@ -143,22 +143,25 @@ export async function fetchExternalArticles(
   return blogPostListSchema.parse(mapped);
 }
 
-
 export async function fetchAllExternalArticles(): Promise<BlogPost[]> {
   const categories: NewsCategory[] = [
     "frontend",
     "development",
     "tech",
     "ki",
-	"linux",
-	"typescript"
+    "linux",
+    "typescript",
   ];
 
-  const results = await Promise.all(
-    categories.map((category) =>
-      fetchExternalArticles(category, 1)
-    )
-  );
+  const results: BlogPost[] = [];
 
-  return results.flat();
+  for (const category of categories) {
+    const articles = await fetchExternalArticles(category, 1);
+
+    if (articles.length > 0) {
+      results.push(articles[0]);
+    }
+  }
+
+  return results;
 }
