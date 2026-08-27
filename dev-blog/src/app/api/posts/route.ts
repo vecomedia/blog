@@ -17,7 +17,7 @@ export const revalidate = 900;
 // Restrict which origins are allowed to call this from a browser.
 // Doesn't affect server-to-server calls (like PHP's curl), only fetch()
 // calls made directly from someone's browser tab.
-const ALLOWED_ORIGIN = "https://blog-nu-steel-78.vercel.app//"
+const ALLOWED_ORIGIN = "https://blog-nu-steel-78.vercel.app"
  
 export async function GET(request: NextRequest) {
   const limitParam = request.nextUrl.searchParams.get("limit");
