@@ -156,16 +156,26 @@ export async function fetchAllExternalArticles(): Promise<BlogPost[]> {
   const results: BlogPost[] = [];
 
   for (const category of categories) {
-    const articles = await fetchExternalArticles(category, 1);
-	 console.log(
-        `GNews "${category}": ${articles.length} article(s)`
+    console.log(`START category: ${category}`);
+
+    try {
+      const articles = await fetchExternalArticles(category, 1);
+
+      console.log(
+        `RESULT category: ${category} → ${articles.length} article(s)`
       );
 
-
-    if (articles.length > 0) {
-      results.push(articles[0]);
+      if (articles.length > 0) {
+        results.push(articles[0]);
+      }
+    } catch (error) {
+      console.error(`ERROR category: ${category}`, error);
     }
   }
+
+  console.log(
+    `TOTAL EXTERNAL ARTICLES: ${results.length}`
+  );
 
   return results;
 }
