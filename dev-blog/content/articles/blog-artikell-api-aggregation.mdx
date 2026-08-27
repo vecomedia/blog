@@ -1,0 +1,75 @@
+---
+title: "Blog-Startseite aufsetzen: Eigene Artikel und externe News-API zusammenführen"
+slug: "blog-artikel-api-aggregation-gnews-mdx"
+publishedAt: "2026-08-27"
+featured: false
+tags: ["nextjs", "typescript", "api"]
+excerpt: "Wie eine Next.js-Startseite eigene MDX-Artikel und externe GNews-Artikel über ein gemeinsames Schema zu einer robusten, ausfalltoleranten Artikelliste zusammenführt."
+image: "https://images.unsplash.com/photo-1760548425425-e42e77fa38f1?fm=jpg&q=80&w=1600&auto=format&fit=crop"
+imageAlt: "Nahaufnahme eines Bildschirms mit farbig hervorgehobenem Quellcode"
+category: "Next.js"
+readTime: "3 min"
+---
+
+## Zwei Artikelquellen, eine Blog-Startseite
+
+Der Blog soll zwei völlig unterschiedliche Datenquellen auf einer Startseite zusammenführen: eigene, lokal geschriebene MDX-Artikel und aktuelle News-Artikel von einer externen API. Beide Quellen sehen intern komplett anders aus, sollen dem Nutzer aber als eine einheitliche, sortierte Liste angezeigt werden.
+
+### 1. Ein gemeinsames Zielformat als Vertrag
+
+Der Schlüssel zur sauberen Zusammenführung ist ein gemeinsames `BlogPost`-Schema, auf das beide Quellen abgebildet werden. Egal ob ein Artikel aus dem Dateisystem oder von der News-API kommt: Am Ende hat er dieselben Felder, unter anderem `source: "eigen"` oder `source: "extern"`. Die UI-Komponenten kennen nur dieses eine Format und müssen nie wissen, woher ein Artikel stammt.
+
+### 2. Lokale Artikel: MDX-Dateien mit Frontmatter einlesen
+
+Die eigenen Artikel liegen als Markdown-Dateien unter `content/articles`. Mit `gray-matter` wird pro Datei das Frontmatter (Titel, Datum, Tags etc.) vom eigentlichen Inhalt getrennt:
+
+```typescript
+const raw = fs.readFileSync(fullPath, 'utf-8');
+const { data, content } = matter(raw);
+return { slug: filename.replace(/\.mdx?$/, ''), meta: data, content };
+```
+
+Eine kleine Mapper-Funktion übersetzt dieses Rohformat anschließend in das gemeinsame `BlogPost`-Schema, inklusive sinnvoller Fallback-Werte für fehlende Felder wie `excerpt` oder `category`.
+
+### 3. Externe Artikel: GNews-API pro Kategorie abfragen
+
+Für die externen Artikel wird die GNews-API abgefragt. Statt eines einzelnen Suchbegriffs gibt es eine feste Liste an Kategorien (`frontend`, `development`, `tech`, `ki`, `linux`, `typescript`), die jeweils auf einen Suchbegriff gemappt werden:
+
+```typescript
+export type NewsCategory = "frontend" | "development" | "tech" | "linux" | "ki" | "typescript";
+
+const NEWS_QUERIES: Record<NewsCategory, string> = {
+  frontend: "Frontend",
+  development: "Development",
+  tech: "Tech",
+  linux: "linux",
+  ki: "KI",
+  typescript: "typescript",
+};
+```
+
+`fetchAllExternalArticles` ruft für jede Kategorie `fetchExternalArticles` auf und führt alle Requests parallel per `Promise.all` aus. Jede Antwort wird über `mapToBlogPost` auf dasselbe `BlogPost`-Format gebracht wie die lokalen Artikel und zusätzlich mit `blogPostListSchema.parse` validiert, bevor sie die API-Schicht verlässt.
+
+Für die Anfragen selbst kommt Next.js' eingebautes Fetch-Caching zum Einsatz: `next: { revalidate: 21600 }` sorgt dafür, dass Ergebnisse für sechs Stunden zwischengespeichert werden, statt bei jedem Seitenaufruf erneut gegen ein Rate-Limit der externen API zu laufen.
+
+### 4. Zusammenführen, ohne dass eine Quelle die andere blockiert
+
+Auf der Startseite werden beide Quellen mit `Promise.allSettled` statt `Promise.all` geladen. Der Unterschied ist entscheidend: Schlägt die externe API einmal fehl (Netzwerkfehler, Rate-Limit, fehlender API-Key), soll die Seite trotzdem die lokalen Artikel anzeigen können, statt komplett mit einem Fehler abzubrechen:
+
+```typescript
+const [externalResult, localResult] = await Promise.allSettled([
+  fetchAllExternalArticles(),
+  Promise.resolve(getAllArticlesAsPosts()),
+]);
+
+const external = externalResult.status === "fulfilled" ? externalResult.value : [];
+const local = localResult.status === "fulfilled" ? localResult.value : [];
+
+const posts = [...local, ...external].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+);
+```
+
+Nur wenn wirklich beide Quellen fehlschlagen, wird ein genereller Fehlerzustand angezeigt. Ansonsten werden die vorhandenen Artikel nach Datum sortiert, der neueste als Featured-Artikel hervorgehoben und der Rest im Grid darunter dargestellt.
+
+Am Ende steht eine Startseite, die robust gegenüber dem Ausfall einer einzelnen Datenquelle ist und trotzdem beide Artikeltypen — eigene und externe — über ein gemeinsames Schema einheitlich rendert.
