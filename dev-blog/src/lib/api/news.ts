@@ -118,18 +118,22 @@ export async function fetchExternalArticles(
     },
   });
 
-  if (!res.ok) {
-    const errorBody: GNewsErrorResponse = await res
-      .json()
-      .catch(() => ({ errors: [] }));
+ if (!res.ok) {
+  const errorBody = await res
+    .json()
+    .catch(() => ({ errors: [] }));
 
-    throw new Error(
-      `GNews request failed (${res.status}): ${JSON.stringify(
-        errorBody.errors,
-      )}`,
-    );
+  if (res.status === 429) {
+    console.warn("GNews rate limit reached. Skipping external articles.");
+    return [];
   }
 
+  throw new Error(
+    `GNews request failed (${res.status}): ${JSON.stringify(
+      errorBody.errors,
+    )}`,
+  );
+}
   const data: GNewsResponse = await res.json();
 
   const mapped = data.articles.map((article) =>
