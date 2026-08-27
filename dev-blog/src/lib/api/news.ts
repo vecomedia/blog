@@ -143,6 +143,9 @@ export async function fetchExternalArticles(
   return blogPostListSchema.parse(mapped);
 }
 
+const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 export async function fetchAllExternalArticles(): Promise<BlogPost[]> {
   const categories: NewsCategory[] = [
     "frontend",
@@ -156,26 +159,21 @@ export async function fetchAllExternalArticles(): Promise<BlogPost[]> {
   const results: BlogPost[] = [];
 
   for (const category of categories) {
-    console.log(`START category: ${category}`);
-
     try {
       const articles = await fetchExternalArticles(category, 1);
-
-      console.log(
-        `RESULT category: ${category} → ${articles.length} article(s)`
-      );
 
       if (articles.length > 0) {
         results.push(articles[0]);
       }
     } catch (error) {
-      console.error(`ERROR category: ${category}`, error);
+      console.warn(
+        `Failed to fetch category "${category}":`,
+        error
+      );
     }
-  }
 
-  console.log(
-    `TOTAL EXTERNAL ARTICLES: ${results.length}`
-  );
+    await sleep(1100);
+  }
 
   return results;
 }
