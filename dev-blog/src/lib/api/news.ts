@@ -157,6 +157,10 @@ export async function fetchAllExternalArticles(): Promise<BlogPost[]> {
 
   for (const category of categories) {
     const articles = await fetchExternalArticles(category, 1);
+	 console.log(
+        `GNews "${category}": ${articles.length} article(s)`
+      );
+
 
     if (articles.length > 0) {
       results.push(articles[0]);
