@@ -27,12 +27,10 @@ async function getMorePosts(currentSlug: string): Promise<BlogPost[]> {
   const external = externalResult.status === "fulfilled" ? externalResult.value : [];
   const local = localResult.status === "fulfilled" ? localResult.value : [];
 
-  // Kombinieren und nach Datum sortieren
   const allPosts = [...local, ...external].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  // Den aktuell geöffneten Artikel herausfiltern
   return allPosts.filter((post) => post.slug !== currentSlug);
 }
 
@@ -60,7 +58,7 @@ export default async function ArticlePage({ params }: Props) {
   const isOwn = frontmatter.source === "eigen";
 
   return (
-    <main className="bg-card">
+    <main className="bg-secondary">
       {frontmatter.image && (
         <div className="relative h-84 bg-muted md:h-80">
           <img
@@ -73,21 +71,15 @@ export default async function ArticlePage({ params }: Props) {
       )}
 
       <article
-        className={`mx-auto max-w-4xl overflow-hidden border border-border bg-primary-foreground text-primary ${
+        className={`overflow-hidden border border-border bg-primary text-white ${
           frontmatter.image ? "relative -mt-16 md:-mt-24" : ""
         }`}
       >
         <div className="p-8 lg:p-10">
-          <div className="mb-6 flex flex-wrap items-center gap-3">
-            {isOwn ? (
-              <span className="inline-flex items-center gap-1 bg-accent px-2 py-0.5 font-mono text-[12px] uppercase tracking-[0.22em] text-accent-foreground">
+          <div className="mb-6 flex flex-wrap items-center gap-3">          
+              <span className="inline-flex items-center gap-1 bg-accent px-2 py-0.5 font-mono text-[12px] uppercase tracking-[0.22em] text-card">
                 Eigene
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 border border-border px-2 py-0.5 font-mono text-[12px] uppercase tracking-[0.22em] text-muted-foreground">
-                Extern
-              </span>
-            )}
+              </span>            
             {frontmatter.category && (
               <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-muted-foreground">
                 {frontmatter.category}
@@ -113,19 +105,19 @@ export default async function ArticlePage({ params }: Props) {
           </h1>
 
           {frontmatter.excerpt && (
-            <p className="mb-8 text-base leading-relaxed text-primary">
+            <p className="mb-8 leading-relaxed text-white">
               {frontmatter.excerpt}
             </p>
           )}
 
-          <div className="prose prose-neutral max-w-none space-y-5 border-t border-border text-sm leading-relaxed text-foreground/80 [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-tight">
+          <div className="prose prose-neutral max-w-none space-y-5 border-t border-border text-sm leading-relaxed text-white [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-tight">
             <MDXRemote source={content} components={mdxComponents} />
           </div>
 
           <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-border pt-6">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 border px-4 py-2 font-mono text-[12px] uppercase tracking-[0.2em] text-primary transition-colors hover:border-accent hover:text-accent"
+              className="inline-flex items-center gap-2 border px-4 py-2 font-mono text-[12px] uppercase tracking-[0.2em] text-white transition-colors hover:border-accent hover:text-accent"
             >
               Zurück zu Notizen
             </Link>

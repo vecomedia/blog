@@ -13,8 +13,7 @@ export default function ArticlesPage() {
           if (!a) return null;
           return (
             <li key={a.slug} style={{ margin: '10px 0' }}>
-              {/* Der Link leitet weiter auf /articles/dein-slug */}
-              <Link href={`/articles/${a.slug}`} style={{ color: 'blue', textDecoration: 'underline' }}>
+               <Link href={`/articles/${a.slug}`} style={{ color: 'blue', textDecoration: 'underline' }}>
                 {a.meta.title || 'Unbenannter Artikel'}
               </Link>
             </li>

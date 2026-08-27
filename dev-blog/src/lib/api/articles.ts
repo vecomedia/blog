@@ -57,6 +57,7 @@ function toBlogPost(article: LocalArticle): BlogPost {
     readTime: article.meta.readTime ?? "",
     source: "eigen",
     featured: article.meta.featured,
+	tags:article.meta.tags
   };
 }
 

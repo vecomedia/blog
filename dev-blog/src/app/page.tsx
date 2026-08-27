@@ -1,4 +1,4 @@
-import { fetchExternalArticles } from "@/lib/api/news";
+import { fetchAllExternalArticles } from "@/lib/api/news";
 import { getAllArticlesAsPosts } from "@/lib/api/articles";
 import { FeaturedArticleCard } from "@/lib/components/articles/FeaturedArticleCard";
 import { EmptyState } from "@/lib/components/ui/emptyState";
@@ -7,29 +7,51 @@ import type { BlogPost } from "@/lib/schemas/blogPost";
 import { Header } from "@/lib/components/layout/header";
 import { ArticleGrid } from "@/lib/components/articles/ArticleGrid";
 
-async function getPosts(): Promise<{ posts: BlogPost[]; error: string | null }> {
-  const [externalResult, localResult] = await Promise.allSettled([
-    fetchExternalArticles("frontend"),
-    Promise.resolve(getAllArticlesAsPosts()),
-  ]);
 
-  const external = externalResult.status === "fulfilled" ? externalResult.value : [];
-  const local = localResult.status === "fulfilled" ? localResult.value : [];
+
+async function getPosts(): Promise<{
+  posts: BlogPost[];
+  error: string | null;
+}> {
+  const [externalResult, localResult] =
+    await Promise.allSettled([
+      fetchAllExternalArticles(),
+      Promise.resolve(getAllArticlesAsPosts()),
+    ]);
+
+  const external =
+    externalResult.status === "fulfilled"
+      ? externalResult.value
+      : [];
+
+  const local =
+    localResult.status === "fulfilled"
+      ? localResult.value
+      : [];
 
   if (externalResult.status === "rejected") {
-    console.error("Failed to fetch external articles:", externalResult.reason);
+    console.error(
+      "Failed to fetch external articles:",
+      externalResult.reason
+    );
   }
+
   if (localResult.status === "rejected") {
-    console.error("Failed to load local articles:", localResult.reason);
+    console.error(
+      "Failed to load local articles:",
+      localResult.reason
+    );
   }
 
   const posts = [...local, ...external].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) =>
+      new Date(b.date).getTime() -
+      new Date(a.date).getTime()
   );
 
-  // Nur einen echten Fehler zeigen, wenn BEIDE Quellen fehlgeschlagen sind
   const error =
-    externalResult.status === "rejected" && localResult.status === "rejected"
+    externalResult.status === "rejected" &&
+    localResult.status === "rejected"
       ? "Unbekannter Fehler"
       : null;
 

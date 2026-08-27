@@ -11,7 +11,7 @@ export const blogPostSchema = z.object({
   date: z.string(), 
   readTime: z.string(),
   source: z.enum(["eigen", "extern"]),
-   url: z.string().url().optional().or(z.literal("")),
+  url: z.string().url().optional().or(z.literal("")),
   tags: z.array(z.string()).default([]),
   featured: z.boolean().optional()
 });

@@ -1,4 +1,4 @@
-import { blogPostListSchema, type BlogPost } from "@/lib/schemas/blogPost"
+import { blogPostListSchema, type BlogPost } from "@/lib/schemas/blogPost";
 
 const GNEWS_BASE_URL = "https://gnews.io/api/v4/search";
 
@@ -48,11 +48,12 @@ function mapToBlogPost(article: GNewsArticle, category: string): BlogPost {
     readTime: estimateReadTime(article.content),
     source: "extern",
     url: article.url,
+    tags: [""],
   };
 }
 
-export async function fetchExternalArticles(
-  query: string = "technology"
+/* export async function fetchExternalArticles(
+  query: string = "ki"
 ): Promise<BlogPost[]> {
   const apiKey = process.env.GNEWS_API_KEY;
   if (!apiKey) {
@@ -61,7 +62,8 @@ export async function fetchExternalArticles(
 
   const params = new URLSearchParams({
     q: query,
-    lang: "en",
+    lang: "de",
+	max: "2",
     apikey: apiKey,
   });
 
@@ -78,4 +80,81 @@ export async function fetchExternalArticles(
   const mapped = data.articles.map((article) => mapToBlogPost(article, query));
 
   return blogPostListSchema.parse(mapped);
+} */
+export type NewsCategory = "frontend" | "development" | "tech" | "linux" | "ki" |"typescript";
+
+const NEWS_QUERIES: Record<NewsCategory, string> = {
+  frontend: "Frontend",
+  development: "Development",
+  tech: "Tech",
+  linux: "linux",
+  ki: "KI",
+  typescript: "typescript"
+};
+export async function fetchExternalArticles(
+  category: NewsCategory,
+  limit = 1,
+): Promise<BlogPost[]> {
+  const apiKey = process.env.GNEWS_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("GNEWS_API_KEY is not set");
+  }
+
+  const query = NEWS_QUERIES[category];
+
+  const params = new URLSearchParams({
+    q: query,
+    lang: "de",
+    max: String(limit),
+    apikey: apiKey,
+  });
+
+  console.log(`Fetching GNews category "${category}" with query: ${query}`);
+
+  const res = await fetch(`${GNEWS_BASE_URL}?${params}`, {
+    next: {
+      revalidate: 21600,//6h
+    },
+  });
+
+  if (!res.ok) {
+    const errorBody: GNewsErrorResponse = await res
+      .json()
+      .catch(() => ({ errors: [] }));
+
+    throw new Error(
+      `GNews request failed (${res.status}): ${JSON.stringify(
+        errorBody.errors,
+      )}`,
+    );
+  }
+
+  const data: GNewsResponse = await res.json();
+
+  const mapped = data.articles.map((article) =>
+    mapToBlogPost(article, category),
+  );
+
+  return blogPostListSchema.parse(mapped);
+}
+
+
+export async function fetchAllExternalArticles(): Promise<BlogPost[]> {
+  const categories: NewsCategory[] = [
+    "frontend",
+    "development",
+    "tech",
+    "ki",
+	"linux",
+	"typescript"
+  ];
+
+  const results = await Promise.all(
+    categories.map((category) =>
+      fetchExternalArticles(category, 1)
+    )
+  );
+
+  return results.flat();
 }

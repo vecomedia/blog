@@ -1,20 +1,18 @@
 import type { BlogPost } from "@/lib/schemas/blogPost";
 import { Badge } from "@/lib/components/ui/badge";
-import Link from "next/link"; // 1. Next.js Link importieren
+import Link from "next/link";
 
 interface FeaturedArticleCardProps {
   post: BlogPost;
 }
 
 export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
-  // 2. Prüfen, ob es ein eigener Artikel ist
+
   const isInternal = post.source === "eigen";
   
-  // 3. Pfad bestimmen: Entweder interne Route über den Slug oder externe URL
   const href = isInternal ? `/articles/${post.slug}` : (post.url || "#");
 
-  // Die CSS-Klassen für das Layout bleiben absolut identisch
-  const cardClassName = "group grid grid-cols-1 overflow-hidden border border-border bg-card transition-colors duration-200 hover:border-accent lg:grid-cols-[3fr_2fr]";
+  const cardClassName = "group block grid grid-cols-1 overflow-hidden border rounded-md bg-card transition-colors duration-200 hover:border-accent lg:grid-cols-[3fr_2fr]";
 
   // Der gesamte innere Inhalt der Featured Card
   const CardContent = () => (
@@ -22,6 +20,11 @@ export function FeaturedArticleCard({ post }: FeaturedArticleCardProps) {
       <div className="relative h-64 overflow-hidden bg-muted lg:h-auto">
         <img
           src={post.image}
+          alt={post.imageAlt}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+		   <img
+          src={post.url}
           alt={post.imageAlt}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />

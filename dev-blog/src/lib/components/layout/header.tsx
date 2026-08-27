@@ -12,13 +12,13 @@ export function Header({ totalCount, externalCount, internalCount }: HeaderProps
           <p className="mb-4 font-mono text-[12px] uppercase tracking-[0.3em] text-accent">
             Arbeitsnotizen
           </p>
-          <h1 className="font-display text-[clamp(3rem,7vw,6rem)] font-bold uppercase leading-[0.9] tracking-tight text-primary-foreground">
+          <h1 className="font-display text-[clamp(3rem,7vw,6rem)] font-bold uppercase leading-[0.9] tracking-tight text-accent-foreground">
             Artikel &
             <br />
             <span className="rainbow-accent text-accent">Notizen</span>
           </h1>
         </div>
-        <p className="max-w-xs pb-1 text-sm leading-relaxed text-primary-foreground/50 lg:text-right">
+        <p className="max-w-xs pb-1 text-sm leading-relaxed text-primary-foreground/40 font-mono lg:text-right">
           Eigene Praxisbeiträge und externe Quellen zu Frontend-Architektur,
           TypeScript, API-Integration und Entwicklungs-Workflows.
         </p>

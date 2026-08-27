@@ -7,15 +7,12 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ post }: ArticleCardProps) {
-  // 1. Wenn source "eigen" ist, nutzen wir das Routing für deine lokalen Artikel
   const isInternal = post.source === "eigen";
   
-  // 2. Das generiert exakt deinen Wunschpfad: /articles/my-first-post
   const href = isInternal ? `/articles/${post.slug}` : (post.url || "#");
 
   const cardClassName = "group flex flex-col overflow-hidden border border-border bg-card transition-colors duration-200 hover:border-accent";
 
-  // Der gesamte Inhalt der Karte (Bilder, Titel, Badge, etc.)
   const CardContent = () => (
     <>
       <div className="relative h-48 overflow-hidden bg-muted">
