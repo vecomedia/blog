@@ -39,23 +39,23 @@ The project is intentionally kept simple at the beginning so the focus can remai
 
 Set up the basic Next.js and TypeScript application.
 
-- [ ] Create Next.js application
-- [ ] Configure TypeScript
-- [ ] Set up project structure
-- [ ] Configure styling
-- [ ] Add basic development tooling
+- [x] Create Next.js application
+- [x] Configure TypeScript
+- [x] Set up project structure
+- [x] Configure styling
+- [x] Add basic development tooling
 
 ### 2. API Connection
 
 The first functional step is to establish the connection to the article API.
 
-- [ ] Define article data structure
-- [ ] Create API client
-- [ ] Connect to article endpoint
-- [ ] Fetch featured articles
+- [x] Define article data structure
+- [x] Create API client
+- [x] Connect to article endpoint
+- [x] Fetch featured articles
 - [ ] Handle loading states
-- [ ] Handle API errors
-- [ ] Add basic data validation
+- [x] Handle API errors
+- [x] Add basic data validation
 
 The API layer should remain independent from the UI so that the data source can be changed later if necessary.
 
@@ -63,13 +63,13 @@ The API layer should remain independent from the UI so that the data source can 
 
 After the API connection is working, the existing layout will be implemented in Next.js.
 
-- [ ] Recreate existing layout
-- [ ] Build reusable UI components
-- [ ] Create featured article section
-- [ ] Create article cards
-- [ ] Add responsive behavior
+- [x] Recreate existing layout
+- [x] Build reusable UI components
+- [x] Create featured article section
+- [x] Create article cards
+- [x] Add responsive behavior
 - [ ] Add loading states / skeletons
-- [ ] Connect the layout to the API data
+- [x] Connect the layout to the API data
 
 ### 4. Personal Articles
 
@@ -77,14 +77,13 @@ Once the basic application and layout are working, the project will be extended 
 
 Potential functionality:
 
-- [ ] Personal article structure
-- [ ] Article detail pages
-- [ ] Categories / tags
-- [ ] Featured articles
+- [x] Personal article structure
+- [x] Article detail pages
+- [x] Categories / tags
+- [x] Featured articles
 - [ ] Publication dates
-- [ ] Markdown or MDX support
-- [ ] Images and media
-- [ ] SEO metadata
+- [x] Markdown or MDX support
+- [x] Images and media
 - [ ] Related articles
 
 ### 5. Portfolio Documentation
