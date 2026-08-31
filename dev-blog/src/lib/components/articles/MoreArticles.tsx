@@ -35,7 +35,7 @@ export function MoreArticles({ posts }: MoreArticlesProps) {
 
           return (
             <Link
-              key={post.id || post.slug}
+              key={`${post.source}-${post.slug}-${post.url}`}
 			  href={post.url || "#"}
               target={isExternal ? "_blank" : undefined}
               rel={isExternal ? "noopener noreferrer" : undefined}

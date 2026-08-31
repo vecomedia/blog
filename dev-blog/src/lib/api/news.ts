@@ -157,13 +157,19 @@ export async function fetchAllExternalArticles(): Promise<BlogPost[]> {
   ];
 
   const results: BlogPost[] = [];
+  const seenUrls = new Set<string>();
 
   for (const category of categories) {
     try {
       const articles = await fetchExternalArticles(category, 1);
 
       if (articles.length > 0) {
-        results.push(articles[0]);
+        const article = articles[0];
+
+        if (!seenUrls.has(article.title)) {
+          seenUrls.add(article.title);
+          results.push(article);
+        }
       }
     } catch (error) {
       console.warn(

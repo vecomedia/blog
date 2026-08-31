@@ -39,7 +39,6 @@ export function ArticleCard({ post }: ArticleCardProps) {
         <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
           <div className="flex items-center gap-2">
             <span className="font-mono text-[12px] tracking-wider text-muted-foreground">{post.date}</span>
-            <span className="font-mono text-[12px] text-muted-foreground/40">·</span>
             <span className="font-mono text-[12px] tracking-wider text-muted-foreground">{post.readTime}</span>
           </div>
         </div>
