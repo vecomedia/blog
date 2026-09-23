@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+dev-blog/AGENTS.md
+dev-blog/CLAUDE.md
+dev-blog/content/articles/my-first-post.mdx
+dev-blog/content/articles/Godot_fehler_beheben.mdx

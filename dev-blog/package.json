@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@gnews-io/gnews-io-js": "^3.0.0",
     "gray-matter": "^4.0.3",
     "next": "16.3.0",
     "next-mdx-remote": "^6.0.0",
