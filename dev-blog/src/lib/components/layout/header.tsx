@@ -1,10 +1,31 @@
+"use client";
+
+export type ArticleFilter = "all" | "external" | "internal";
+
 interface HeaderProps {
   totalCount: number;
   externalCount: number;
   internalCount: number;
+  activeFilter: ArticleFilter;
+  onFilterChange: (filter: ArticleFilter) => void;
 }
 
-export function Header({ totalCount, externalCount, internalCount }: HeaderProps) {
+const filterButtonBase =
+  "relative px-5 py-4 font-mono text-[12px] uppercase tracking-[0.25em] transition-colors";
+
+export function Header({
+  totalCount,
+  externalCount,
+  internalCount,
+  activeFilter,
+  onFilterChange,
+}: HeaderProps) {
+  const filters: { key: ArticleFilter; label: string; count: number }[] = [
+    { key: "all", label: "Alle", count: totalCount },
+    { key: "external", label: "Extern", count: externalCount },
+    { key: "internal", label: "Eigene", count: internalCount },
+  ];
+
   return (
     <header className="bg-primary pt-14 text-primary-foreground">
       <div className="flex flex-col justify-between gap-8 px-7 py-14 lg:flex-row lg:items-end lg:px-12 lg:py-20">
@@ -24,20 +45,28 @@ export function Header({ totalCount, externalCount, internalCount }: HeaderProps
         </p>
       </div>
 
-      {/* Filters — static counts for now, not yet wired to actual filtering */}
       <div className="flex items-center gap-0 border-t border-white/10 px-7 lg:px-12">
-        <button className="relative px-5 py-4 font-mono text-[12px] uppercase tracking-[0.25em] text-accent after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-accent">
-          Alle
-          <span className="ml-2 text-accent/70">{totalCount}</span>
-        </button>
-        <button className="px-5 py-4 font-mono text-[12px] uppercase tracking-[0.25em] text-primary-foreground/40">
-          Extern
-          <span className="ml-2 text-primary-foreground/25">{externalCount}</span>
-        </button>
-		   <button className="px-5 py-4 font-mono text-[12px] uppercase tracking-[0.25em] text-primary-foreground/40">
-          Eigene
-          <span className="ml-2 text-primary-foreground/25">{internalCount}</span>
-        </button>
+        {filters.map(({ key, label, count }) => {
+          const isActive = activeFilter === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onFilterChange(key)}
+              aria-pressed={isActive}
+              className={`${filterButtonBase} ${
+				isActive
+					? "text-accent after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-accent"
+					: "text-primary-foreground/40 hover:text-primary-foreground/70"
+				}`}
+            >
+              {label}
+              <span className={`ml-2 ${isActive ? "text-accent/70" : "text-primary-foreground/25"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </header>
   );
