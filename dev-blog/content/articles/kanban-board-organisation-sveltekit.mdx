@@ -140,6 +140,6 @@ export async function createTask(task: Task) {
 }
 ```
 
-Das hat einen klaren Nachteil: Es gibt kein Locking, gleichzeitige Schreibvorgänge könnten sich theoretisch überschreiben. Für den aktuellen Einsatzzweck – ein lokales Tool für die eigene Aufgabenliste – ist das ein akzeptabler Kompromiss, der sich bei Bedarf später gegen eine Datenbank austauschen lässt.
+Das hat einen klaren Nachteil wenn es mehrere Nutzer gibt: Es gibt kein Locking, gleichzeitige Schreibvorgänge könnten sich theoretisch überschreiben. Für den aktuellen Einsatzzweck – ein lokales Tool für die eigene Aufgabenliste – ist die JSON File eine Art Provisorium, das sich bei Bedarf später gegen eine Datenbank austauschen lässt.
 
 Damit steht das Grundgerüst: Tasks anlegen, filtern, per Drag-and-Drop durch die Spalten schieben, alles typsicher validiert und persistiert. Im nächsten Teil geht es um das Bearbeiten bestehender Tasks.
