@@ -1,0 +1,51 @@
+---
+title: "Von In-Memory-Daten zu PostgreSQL: Eine Next.js-App auf eine echte Datenbank umziehen"
+slug: "von-in-memory-zu-postgres-migration"
+publishedAt: "2026-08-25"
+date: "2026-08-11"
+featured: true
+tags: ["nextjs", "prisma","poc"]
+excerpt: "Wie man eine Next.js-App, die zunächst mit Faker.js-Mockdaten im Speicher lief, sauber auf eine PostgreSQL-Datenbank mit Prisma umstellt, ohne Seiten oder Komponenten anzufassen."
+image: "https://images.unsplash.com/photo-1542903660-eedba2cda473?fm=jpg&q=80&w=1600&auto=format&fit=crop"
+imageAlt: "Code-Editor mit mehreren Codezeilen auf einem Bildschirm"
+category: "Next.js, prisma, Frontend"
+readTime: "4 min"
+---
+
+## Der Umstieg von Mockdaten auf eine echte Datenbank
+
+Viele Next.js-Projekte starten mit Daten, die einfach im Speicher liegen — praktisch für den Anfang, aber irgendwann reicht das nicht mehr. Genau dieser Schritt stand bei einem Scheduling-Projekt an: von Faker.js-generierten Arrays im Modul-Scope hin zu einer echten PostgreSQL-Datenbank über Prisma.
+
+### 1. Warum überhaupt mit In-Memory-Daten starten?
+
+Am Anfang ging es nicht um Persistenz, sondern um UI-Architektur, Auth-Flows und Routing. Mit Faker.js einmalig beim Modul-Load generierte Daten in Arrays zu halten, hält die Einstiegshürde niedrig — kein Server, keine Migrationen, kein Setup. Das ist eine bewusste Entscheidung für frühe Projektphasen, kein Kompromiss aus Faulheit.
+
+### 2. Der Umzug: Prisma als Schicht dazwischen
+
+Der eigentliche Trick beim Wechsel war, die bestehende Datenzugriffsschicht (`lib/data.ts`) so zu gestalten, dass sie schon vorher wie ein Repository aussah — mit benannten Funktionen wie `getPatients` oder `getAppointments`, statt direktem Array-Zugriff verstreut im Code. Beim Umstieg auf Prisma musste sich nur die **Implementierung** dieser Funktionen ändern:
+
+```typescript
+// vorher: Filterung im Speicher
+export function getPatients() {
+  return patients.filter(...);
+}
+
+// nachher: Prisma-Query gegen Postgres
+export async function getPatients() {
+  return prisma.patient.findMany();
+}
+```
+
+Seiten und Komponenten, die diese Funktionen aufrufen, mussten dafür nicht angefasst werden — sie kannten ohnehin nur die Funktionssignatur, nie die interne Datenquelle.
+
+### 3. Verknüpfte Daten: Joins in die Query verlagern
+
+Ein Beispiel, das beim Umstieg besonders sauber aufging: Statt IDs an Komponenten weiterzureichen und Namen erst im Template nachzuschlagen, liefert die Datenschicht direkt vollständige, verknüpfte Objekte (z. B. eine Terminbuchung inklusive der zugehörigen Patient- und Arzt-Daten). Mit Prisma passiert das über `include` direkt in der Query, statt manuell im Code zu verknüpfen.
+
+### 4. Seed-Daten bleiben Faker — nur der Zielort ändert sich
+
+Faker.js verschwindet nicht komplett aus dem Projekt. Es läuft weiterhin, aber jetzt nur noch einmalig in einem `prisma/seed.ts`-Skript, das realistische, relational verknüpfte Testdaten erzeugt und über Prisma in Postgres schreibt — statt sie bei jedem Start neu im Speicher zu generieren.
+
+Das Ergebnis: eine App, die anfangs bewusst leichtgewichtig war, jetzt aber echte Persistenz hat, ohne dass die Migration die Struktur des restlichen Codes durcheinandergebracht hätte.
+
+Work in Progress
